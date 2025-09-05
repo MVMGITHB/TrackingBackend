@@ -49,7 +49,7 @@ export const trackClick = async (req, res) => {
 }
 
   try {
-    const existing = await Click.findOne({ campaignId: campaign_id, pubId: pub_id, ip });
+    const existing = await Click.findOne({ campaignId: campaign_id, pubId: pub_id, ip,userAgent  });
     const isUnique = !existing;
 
     const click = await Click.create({
