@@ -10,7 +10,11 @@ export const trackClick = async (req, res) => {
   let { campaign_id, pub_id,originalClick } = req.query;
 
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const ip =req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
+  // const ip =req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
+  const ip =
+  req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+  req.ip ||
+  req.connection.remoteAddress;
 
 
   const userAgent = req.headers['user-agent'];
