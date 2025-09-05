@@ -49,7 +49,20 @@ export const trackClick = async (req, res) => {
 }
 
   try {
-    const existing = await Click.findOne({ campaignId: campaign_id, pubId: pub_id, ip,userAgent  });
+
+     let deviceId = req.cookies.deviceId;
+    if (!deviceId) {
+      deviceId = uuidv4();
+      res.cookie("deviceId", deviceId, {
+        maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
+        httpOnly: false,
+        secure: true,
+        sameSite: "None",
+      });
+    }
+
+
+    const existing = await Click.findOne({ campaignId: campaign_id, pubId: pub_id, ip,userAgent,deviceId: deviceId });
     const isUnique = !existing;
 
     const click = await Click.create({
@@ -60,6 +73,7 @@ export const trackClick = async (req, res) => {
       userAgent,
       referrer,
       isUnique,
+      deviceId:deviceId,
       originalClick:originalClick
     });
 

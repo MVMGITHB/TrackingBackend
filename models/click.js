@@ -4,6 +4,7 @@ const clickSchema = new mongoose.Schema({
   campaignId: String,
   pubId: String,
   clickId: String,
+  deviceId: String,
   ip: String,
   userAgent: String,
   referrer: String,
