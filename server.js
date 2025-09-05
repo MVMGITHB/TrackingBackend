@@ -12,6 +12,11 @@ import clickRoutes from './routes/click.js';
 import conversionRoutes from './routes/conversionRoutes.js';
 import campaignReportRoutes from './routes/reportRoutes.js';
 
+
+import cookieParser from "cookie-parser";
+
+
+
 const app = express();
 dotenv.config();
 connectDB();
@@ -71,6 +76,7 @@ app.use(
 );
 
 app.set("trust proxy", true);
+app.use(cookieParser());
 
 app.use(express.json());
 app.use('/api/users', userRoutes);
