@@ -18,8 +18,20 @@ export const trackClick = async (req, res) => {
   req.socket.remoteAddress;
 
 
+
+
+
   const userAgent = req.headers['user-agent'];
   const referrer = req.headers['referer'];
+
+
+  console.log("IP DEBUG:", {
+  req_ip: req.ip,
+  x_forwarded_for: req.headers["x-forwarded-for"],
+  x_real_ip: req.headers["x-real-ip"],
+  remote_addr: req.socket.remoteAddress,
+});
+
 
 
   if (campaign_id !== undefined) {
