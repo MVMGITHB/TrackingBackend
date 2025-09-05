@@ -613,8 +613,8 @@ export const getCampaignByPubIdReport = async (req, res) => {
     const clickData = await Click.aggregate([
       {
         $match: {
-          pubId: pubId.toString(),
-          timestamp: { $gte: start, $lte: end },
+         pubId: { $exists: true, $ne: null, $eq: pubId.toString() },
+         timestamp: { $gte: start, $lte: end },
         },
       },
       {
@@ -630,6 +630,8 @@ export const getCampaignByPubIdReport = async (req, res) => {
         },
       },
     ]);
+
+    console.log(clickData)
 
     if (clickData.length === 0) {
       return res.json({ success: true, report: [] });
