@@ -8,7 +8,12 @@ import xlsx from "xlsx";
 import fs from "fs";
 
 export const handlePostback = async (req, res) => {
-  const { click_id, amount } = req.query;
+  const { click_id} = req.query;
+       
+
+   const amount = req.query.amount && !isNaN(req.query.amount) 
+  ? Number(req.query.amount) 
+  : 0;
 
   try {
     // 1. Find click
