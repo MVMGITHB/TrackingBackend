@@ -123,22 +123,36 @@ export const trackClick = async (req, res) => {
 
 
 
+const extraParams = `campaignId=${campaign_id}&pubId=${pub_id}`;
 
-const redirectUri1 = campaign?.trakingUrl?.replace('{click_id}', click.clickId)  
+let redirectUri1 = campaign?.trakingUrl?.replace("{click_id}", click.clickId);
+
+if (redirectUri1.includes("https://tracking.ajio.business/click") && redirectUri1.includes("&redirect=")) {
+  redirectUri1 = redirectUri1.replace("&redirect=", `&${extraParams}&redirect=`);
+}
+
+
+// console.log("redirectUri1",redirectUri1)
 
 const redirectUri = new URL(redirectUri1);
 
 // Build your extra params
-const extraParams = `cid=${click.clickId}&campaignId=${campaign_id}&pubId=${pub_id}`;
+
 
 // Check if ? already exists in the base URL
 let finalUrl;
-if (redirectUri.search) {
+
+if(redirectUri1.includes("https://tracking.ajio.business/click") && redirectUri1.includes("&redirect=")){
+    finalUrl= redirectUri
+}
+else if (redirectUri.search) {
   // URL already has ?
   finalUrl = `${redirectUri.toString()}&${extraParams}`;
-} else {
+  // console.log("for ?",finalUrl)
+}else {
   // No query yet
   finalUrl = `${redirectUri.toString()}?${extraParams}`;
+  // console.log("for ",finalUrl)
 }
 
 // Redirect to final URL

@@ -631,7 +631,7 @@ export const getCampaignByPubIdReport = async (req, res) => {
       },
     ]);
 
-    console.log(clickData)
+    // console.log(clickData)
 
     if (clickData.length === 0) {
       return res.json({ success: true, report: [] });
