@@ -11,6 +11,7 @@ import compaignRoutes from "./routes/compaignRoutes.js";
 import clickRoutes from './routes/click.js';
 import conversionRoutes from './routes/conversionRoutes.js';
 import campaignReportRoutes from './routes/reportRoutes.js';
+import logsRoute from "./routes/logsRoute.js";
 
 
 import cookieParser from "cookie-parser";
@@ -86,6 +87,7 @@ app.use("/api/compaigns", compaignRoutes);
 app.use('/api/clicks', clickRoutes);
 app.use('/api/conversion', conversionRoutes);
 app.use('/api/reports', campaignReportRoutes);
+app.use("/api/logs", logsRoute);
 
 
 app.get('/', (req, res) => {

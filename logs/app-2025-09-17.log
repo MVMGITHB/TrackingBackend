@@ -1,0 +1,5 @@
+[2025-09-17 10:43:58] INFO: Conversion saved | click_id: 572a04f2-140d-4716-9ba0-a71e259b25b6, amount: 0
+[2025-09-17 10:43:58] INFO: Campaign updated | campaignId: 375, amount: 0
+[2025-09-17 10:43:58] INFO: Campaign updated | campaignId: 375, url: https://yourdomain.com/postback?click_id={}&payout=3
+[2025-09-17 10:55:27] WARN: Click not found | click_id: 572a04f2-140d-4716-9ba0-71e259b25b6
+[2025-09-17 11:02:09] WARN: Click not found | click_id: 572a04f2-140d-4716-9ba0-71259b25b6

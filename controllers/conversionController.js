@@ -4,6 +4,8 @@ import Affiliate from '../models/affiliateModel.js';
 import fetch from 'node-fetch';
 import Compaign from "../models/compaignModel.js";
 
+import logger from "../utils/logger.js";
+
 import xlsx from "xlsx";
 import fs from "fs";
 
@@ -19,12 +21,14 @@ export const handlePostback = async (req, res) => {
     // 1. Find click
     const click = await Click.findOne({ clickId: click_id });
     if (!click) {
+       logger.warn(`Click not found | click_id: ${click_id}`);
       return res.status(404).json({ message: 'Click not found' });
     }
 
     const presentClick = await Conversion.findOne({clickId:click_id});
 
     if(presentClick){
+       logger.warn(`Conversion already exists | click_id: ${click_id}`);
        return res.status(404).json({ message: 'Conversion already present' });
     }
 
@@ -35,6 +39,8 @@ export const handlePostback = async (req, res) => {
       pubId: click.pubId,
       amount: amount || 0
     });
+
+    logger.info(`Conversion saved | click_id: ${click_id}, amount: ${amount}`);
 
 
 
@@ -57,6 +63,8 @@ export const handlePostback = async (req, res) => {
           }
         }
       );
+
+      logger.info(`Campaign updated | campaignId: ${click.campaignId}, amount: ${amount}`);
     }
 
 
@@ -75,6 +83,8 @@ export const handlePostback = async (req, res) => {
         .catch((err) =>
           console.error(`Postback failed: ${finalUrl}`, err.message)
         );
+
+        logger.info(`Campaign updated | campaignId: ${click.campaignId}, url: ${finalUrl}`);
     }
 
     res.status(200).json({ message: 'Conversion tracked and postback fired' });

@@ -132,7 +132,7 @@ if (redirectUri1.includes("https://tracking.ajio.business/click") && redirectUri
 }
 
 
-// console.log("redirectUri1",redirectUri1)
+console.log("redirectUri1",redirectUri1)
 
 const redirectUri = new URL(redirectUri1);
 
