@@ -11,6 +11,8 @@ export const trackClick = async (req, res) => {
 
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   // const ip =req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
+
+
   let ip =
   req.headers["x-forwarded-for"]?.split(",")[0].trim() || 
   req.headers["x-real-ip"] ||
@@ -25,12 +27,12 @@ export const trackClick = async (req, res) => {
   const referrer = req.headers['referer'];
 
 
-  console.log("IP DEBUG:", {
-  req_ip: req.ip,
-  x_forwarded_for: req.headers["x-forwarded-for"],
-  x_real_ip: req.headers["x-real-ip"],
-  remote_addr: req.socket.remoteAddress,
-});
+//   console.log("IP DEBUG:", {
+//   req_ip: req.ip,
+//   x_forwarded_for: req.headers["x-forwarded-for"],
+//   x_real_ip: req.headers["x-real-ip"],
+//   remote_addr: req.socket.remoteAddress,
+// });
 
 
 
@@ -39,6 +41,17 @@ export const trackClick = async (req, res) => {
   if (isNaN(campaign_id)) {
     return res.status(400).json({ success: false, message: "Invalid compId" });
   }
+
+  const compaign = await Compaign.findOne({compId:campaign_id})
+
+  if(!compaign){
+    return res.send("<h1>INVALID_COMPAIGN</h1>")
+  }
+
+  if(compaign.status !=='Active'){
+     return res.send(`<h1>COMPAIGN is ${compaign.status}</h1>`)
+  }
+
 }
 
   if (pub_id !== undefined) {
@@ -46,6 +59,32 @@ export const trackClick = async (req, res) => {
   if (isNaN(pub_id)) {
     return res.status(400).json({ success: false, message: "Invalid pub_id" });
   }
+
+  const publicer = await Affiliate.findOne({pubId:pub_id})
+
+  if(!publicer){
+    return res.send("<h1>INVALID_PUBLISER</h1>")
+  }
+
+
+
+
+
+const compaign = await Compaign.findOne({ compId: campaign_id });
+
+    if (!compaign) {
+      return res.status(404).json({ success: false, message: "Campaign not found" });
+    }
+
+    // if campaign is private -> check allowedAffiliates
+    if (
+      compaign.visibility === "Private" &&
+      (!compaign.allowedAffiliates || !compaign.allowedAffiliates.includes(publicer._id))
+    ) {
+      return res.send("<h1>COMPAIGN_INVALID_ACCESS</h1>")
+    }
+  
+  
 }
 
   try {
@@ -132,7 +171,7 @@ if (redirectUri1.includes("https://tracking.ajio.business/click") && redirectUri
 }
 
 
-console.log("redirectUri1",redirectUri1)
+// console.log("redirectUri1",redirectUri1)
 
 const redirectUri = new URL(redirectUri1);
 

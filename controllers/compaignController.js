@@ -272,37 +272,26 @@ export const getAllCompaigns1 = async (req, res) => {
 
 
 
-
 export const updateAllowedAffiliates = async (req, res) => {
   try {
     const { id } = req.params; // campaign id
     const { allowedAffiliates } = req.body; // array of affiliate IDs
 
-    if (!Array.isArray(allowedAffiliates) || allowedAffiliates.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "allowedAffiliates must be a non-empty array of affiliate IDs",
-      });
-    }
-
     const compaign = await Compaign.findById(id);
     if (!compaign) {
-      return res.status(404).json({ success: false, message: "Compaign not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Compaign not found" });
     }
 
-    // Add new affiliates only if not already present
-    const existingIds = compaign.allowedAffiliates.map((a) => a.toString());
-    const newIds = allowedAffiliates.filter((id) => !existingIds.includes(id));
+    // ✅ Update with provided IDs (even empty array)
+    // compaign.allowedAffiliates = Array.isArray(allowedAffiliates)
+    //   ? allowedAffiliates
+    //   : compaign.allowedAffiliates;
 
-    compaign.allowedAffiliates = [...compaign.allowedAffiliates, ...newIds];
+    compaign.allowedAffiliates = allowedAffiliates?allowedAffiliates:[]
 
-    // validation: must not be empty if campaign is Private
-    if (compaign.visibility === "Private" && compaign.allowedAffiliates.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "allowedAffiliates must contain at least one Affiliate when visibility is Private",
-      });
-    }
+   
 
     const updated = await compaign.save();
 
@@ -312,6 +301,53 @@ export const updateAllowedAffiliates = async (req, res) => {
       data: updated.allowedAffiliates,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: error.message });
   }
 };
+
+
+
+// export const updateAllowedAffiliates = async (req, res) => {
+//   try {
+//     const { id } = req.params; // campaign id
+//     const { allowedAffiliates } = req.body; // array of affiliate IDs
+
+//     if (!Array.isArray(allowedAffiliates) || allowedAffiliates.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "allowedAffiliates must be a non-empty array of affiliate IDs",
+//       });
+//     }
+
+//     const compaign = await Compaign.findById(id);
+//     if (!compaign) {
+//       return res.status(404).json({ success: false, message: "Compaign not found" });
+//     }
+
+//     // Add new affiliates only if not already present
+//     const existingIds = compaign.allowedAffiliates.map((a) => a.toString());
+//     const newIds = allowedAffiliates.filter((id) => !existingIds.includes(id));
+
+//     compaign.allowedAffiliates = [...compaign.allowedAffiliates, ...newIds];
+
+//     // validation: must not be empty if campaign is Private
+//     if (compaign.visibility === "Private" && compaign.allowedAffiliates.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "allowedAffiliates must contain at least one Affiliate when visibility is Private",
+//       });
+//     }
+
+//     const updated = await compaign.save();
+
+//     res.status(200).json({
+//       success: true,
+//       message: "allowedAffiliates updated successfully",
+//       data: updated.allowedAffiliates,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
