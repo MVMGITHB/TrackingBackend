@@ -1,3 +1,6 @@
+
+
+
 // import mongoose from "mongoose";
 
 // const compaignSchema = new mongoose.Schema(
@@ -56,6 +59,18 @@
 //       ref: "Advertiser",
 //       default: null,
 //     },
+
+
+//     // new
+//   clicks: { type: Number, default: 0 },
+//   conversions: { type: Number, default: 0 },
+//   saleAmount: { type: Number, default: 0 },
+//   extendedConversions: { type: Number, default: 0 },
+//   cancelledConversions: { type: Number, default: 0 },
+//   pendingConversions: { type: Number, default: 0 },
+//   conversionRate: { type: Number, default: 0 }, // CR in %
+
+
 //   },
 //   { timestamps: true }
 // );
@@ -75,6 +90,7 @@
 
 // const Compaign = mongoose.model("Compaign", compaignSchema);
 // export default Compaign;
+
 
 
 import mongoose from "mongoose";
@@ -136,6 +152,19 @@ const compaignSchema = new mongoose.Schema(
       default: null,
     },
 
+    // 👇 new fields for visibility
+    visibility: {
+      type: String,
+      enum: ["Public", "Private"],
+      default: "Public",
+    },
+    
+    allowedAffiliates: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Affiliate", // only valid when visibility = "Private"
+      },
+    ],
 
     // new
   clicks: { type: Number, default: 0 },
