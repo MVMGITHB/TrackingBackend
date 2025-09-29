@@ -10,7 +10,18 @@ import xlsx from "xlsx";
 import fs from "fs";
 
 export const handlePostback = async (req, res) => {
-  const { click_id} = req.query;
+  let { click_id} = req.query;
+
+if (click_id) {
+  // Remove curly braces and spaces
+  click_id = click_id.replace(/[{}\s]/g, "");
+}
+
+
+// console.log(click_id)
+
+
+
        
 
    const amount = req.query.amount && !isNaN(req.query.amount) 

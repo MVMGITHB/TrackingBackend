@@ -1,0 +1,6 @@
+[2025-09-29 11:14:54] INFO: Conversion saved | click_id: 45c9418e-9e0d-45b4-bd5c-ad5a4835ae13, amount: 0
+[2025-09-29 11:14:54] INFO: Campaign updated | campaignId: 375, amount: 0
+[2025-09-29 11:14:54] INFO: Campaign updated | campaignId: 375, url: https://yourdomain.com/postback?click_id={}&payout=3
+[2025-09-29 11:15:37] WARN: Conversion already exists | click_id: 45c9418e-9e0d-45b4-bd5c-ad5a4835ae13
+[2025-09-29 11:16:35] WARN: Click not found | click_id: 45c9418e-9e0d-45b4-bd5c-ad5a4835ae131
+[2025-09-29 11:16:58] WARN: Conversion already exists | click_id: 45c9418e-9e0d-45b4-bd5c-ad5a4835ae13
