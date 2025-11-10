@@ -35,7 +35,7 @@ export const createAdvertiser = async (req, res) => {
 // Read All
 export const getAllAdvertisers = async (req, res) => {
   try {
-    const advertisers = (await Advertiser.find().populate("manager")).sort({ createdAt: -1 });
+    const advertisers = (await Advertiser.find().populate("manager")).reverse();
     res.json({ success: true, data: advertisers });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
