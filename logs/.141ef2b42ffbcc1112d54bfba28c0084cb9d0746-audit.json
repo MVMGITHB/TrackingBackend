@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Elements(d)\\All BACKEND\\TrackingBackend\\logs\\.141ef2b42ffbcc1112d54bfba28c0084cb9d0746-audit.json",
+    "files": [
+        {
+            "date": 1762770093361,
+            "name": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Elements(d)\\All BACKEND\\TrackingBackend\\logs\\app-2025-11-10.log",
+            "hash": "0d3baa110b19447359297c1cf47a9022c8c1df6b07d1b578d19313114cf86a04"
+        }
+    ],
+    "hashType": "sha256"
+}

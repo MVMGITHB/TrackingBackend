@@ -147,7 +147,7 @@ export const createCompaign = async (req, res) => {
 // Get All
 export const getAllCompaigns = async (req, res) => {
   try {
-    const compaigns = await Compaign.find().populate("advertiser");
+    const compaigns = await Compaign.find().populate("advertiser").sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: compaigns });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -157,7 +157,7 @@ export const getAllCompaigns = async (req, res) => {
 // Get One
 export const getCompaignById = async (req, res) => {
   try {
-    const compaign = await Compaign.findById(req.params.id).populate("advertiser");
+    const compaign = await Compaign.findById(req.params.id).populate("advertiser").sort({ createdAt: -1 });
     if (!compaign) return res.status(404).json({ success: false, message: "Compaign not found" });
     res.status(200).json({ success: true, data: compaign });
   } catch (error) {

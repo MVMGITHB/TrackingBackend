@@ -71,7 +71,7 @@ export const getAllAffiliates = async (req, res) => {
   try {
     const affiliates = await Affiliate.find()
       .select('-password')
-      .populate('manager', 'name email'); // Adjust fields as needed
+      .populate('manager', 'name email').sort({ createdAt: -1 }); // Adjust fields as needed
 
     res.status(200).json(affiliates);
   } catch (error) {
@@ -95,7 +95,7 @@ export const getAffiliateById = async (req, res) => {
 export const updateAffiliate = async (req, res) => {
   const { firstname, lastName, email, password, status, affiliateName, manager,postBackUrl } = req.body;
   try {
-    const affiliate = await Affiliate.findById(req.params.id);
+    const affiliate = await Affiliate.findById(req.params.id).sort({ createdAt: -1 });;
     if (!affiliate) return res.status(404).json({ message: 'Affiliate not found' });
 
     affiliate.firstname = firstname || affiliate.firstname;

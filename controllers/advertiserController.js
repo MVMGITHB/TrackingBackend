@@ -35,7 +35,7 @@ export const createAdvertiser = async (req, res) => {
 // Read All
 export const getAllAdvertisers = async (req, res) => {
   try {
-    const advertisers = await Advertiser.find().populate("manager");
+    const advertisers = (await Advertiser.find().populate("manager")).sort({ createdAt: -1 });
     res.json({ success: true, data: advertisers });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -45,7 +45,7 @@ export const getAllAdvertisers = async (req, res) => {
 // Read by ID
 export const getAdvertiserById = async (req, res) => {
   try {
-    const advertiser = await Advertiser.findById(req.params.id).populate("manager");
+    const advertiser = await Advertiser.findById(req.params.id).populate("manager").sort({ createdAt: -1 });;
     if (!advertiser) {
       return res.status(404).json({ success: false, message: "Advertiser not found" });
     }
@@ -62,7 +62,7 @@ export const updateAdvertiser = async (req, res) => {
 
     const {name,status,manager} = req.body
 
-     const advertiser = await Advertiser.findById(req.params.id);
+     const advertiser = await Advertiser.findById(req.params.id).sort({ createdAt: -1 });;
      if (!advertiser) return res.status(404).json({ message: 'Advertiser not found' });
      
      advertiser.name = name || advertiser.name;
