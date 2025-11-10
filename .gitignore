@@ -17,6 +17,8 @@
 /.next/
 /out/
 
+logs/*.log
+
 # production
 /build
 
