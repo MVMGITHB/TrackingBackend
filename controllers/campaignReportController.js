@@ -998,3 +998,220 @@ export const getAffiliateReportByDate = async (req, res) => {
   }
 };
 
+
+export const getCampaignBySubIdReport = async (req, res) => {
+  try {
+    const { startDate, endDate, pubId } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Start and end date are required",
+      });
+    }
+
+    if (!pubId) {
+      return res.status(400).json({
+        success: false,
+        message: "pubId is required",
+      });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    // Step 1: Aggregate clicks grouped by campaignId + sub1
+    const clickData = await Click.aggregate([
+      {
+        $match: {
+          pubId: { $exists: true, $ne: null, $eq: pubId.toString() },
+          timestamp: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: { campaignId: "$campaignId", sub1: "$sub1" },
+          totalClicks: { $sum: 1 },
+          uniqueClicks: {
+            $sum: {
+              $cond: [{ $eq: ["$isUnique", true] }, 1, 0],
+            },
+          },
+          clickIds: { $push: "$clickId" },
+        },
+      },
+    ]);
+
+    if (clickData.length === 0) {
+      return res.json({ success: true, report: [] });
+    }
+
+    // Step 2: Aggregate conversions by campaignId + sub1
+    const allClickIds = clickData.flatMap((cd) => cd.clickIds);
+    const conversionData = await Conversion.aggregate([
+      {
+        $match: {
+          pubId: pubId.toString(),
+          clickId: { $in: allClickIds },
+          timestamp: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $lookup: {
+          from: "clicks",
+          localField: "clickId",
+          foreignField: "clickId",
+          as: "clickInfo",
+        },
+      },
+      { $unwind: "$clickInfo" },
+      {
+        $group: {
+          _id: { campaignId: "$campaignId", sub1: "$clickInfo.sub1" },
+          totalConversions: { $sum: 1 },
+          totalSaleAmount: { $sum: { $toDouble: "$amount" } },
+        },
+      },
+    ]);
+
+    // Step 3: Fetch campaign details
+    const campaignIds = [...new Set(clickData.map((c) => Number(c._id.campaignId)))];
+    const campaigns = await Campaign.find({ compId: { $in: campaignIds } });
+
+    // Step 4: Build report
+    const report = clickData.map((clickInfo) => {
+      const { campaignId, sub1 } = clickInfo._id;
+      const campaign = campaigns.find((c) => Number(c.compId) === Number(campaignId));
+      const conversionInfo = conversionData.find(
+        (conv) =>
+          Number(conv._id.campaignId) === Number(campaignId) &&
+          conv._id.sub1 === sub1
+      );
+
+      const clicks = clickInfo.totalClicks || 0;
+      const uniqueClicks = clickInfo.uniqueClicks || 0;
+      const conversions = conversionInfo ? conversionInfo.totalConversions : 0;
+      const saleAmount = conversionInfo ? conversionInfo.totalSaleAmount : 0;
+      const payout = campaign ? parseFloat(campaign.payout) || 0 : 0;
+      const cr = clicks > 0 ? ((conversions / clicks) * 100).toFixed(2) : 0;
+
+      return {
+        Campaign: campaign ? campaign.offerName : `Campaign ${campaignId}`,
+        pubId: Number(pubId),
+        sub1: sub1 || "N/A",
+        Clicks: clicks,
+        "Unique Clicks": uniqueClicks,
+        Conversions: conversions,
+        "Conversion Rate (CR)": `${cr}%`,
+        Payout: payout,
+        "Payout in INR": payout * conversions,
+        "Sale Amount": saleAmount,
+        "Sale Amount in INR": saleAmount,
+      };
+    });
+
+    // Step 5: Totals (overall)
+    const totalClicks = report.reduce((sum, r) => sum + r.Clicks, 0);
+    const totalUniqueClicks = report.reduce((sum, r) => sum + r["Unique Clicks"], 0);
+    const totalConversions = report.reduce((sum, r) => sum + r.Conversions, 0);
+    const totalPayout = report.reduce((sum, r) => sum + r["Payout in INR"], 0);
+    const totalSaleAmount = report.reduce((sum, r) => sum + r["Sale Amount"], 0);
+    const totalCR =
+      totalClicks > 0 ? ((totalConversions / totalClicks) * 100).toFixed(2) : 0;
+
+    report.push({
+      Campaign: "Total",
+      pubId: Number(pubId),
+      sub1: "—",
+      Clicks: totalClicks,
+      "Unique Clicks": totalUniqueClicks,
+      Conversions: totalConversions,
+      "Conversion Rate (CR)": `Avg: ${totalCR}%`,
+      Payout: "",
+      "Payout in INR": totalPayout,
+      "Sale Amount": totalSaleAmount,
+      "Sale Amount in INR": totalSaleAmount,
+    });
+
+    res.json({ success: true, report });
+  } catch (err) {
+    console.error("Error generating sub1 report:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+export const getDailyStats = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const clicks = await Click.countDocuments({
+      timestamp: { $gte: today, $lt: tomorrow },
+    });
+
+    const hosts = await Click.distinct("ip", {
+      timestamp: { $gte: today, $lt: tomorrow },
+    });
+
+    const conversions = await Conversion.countDocuments({
+      timestamp: { $gte: today, $lt: tomorrow },
+    });
+
+    res.json({
+      clicks,
+      hosts: hosts.length,
+      conversions,
+    });
+  } catch (error) {
+    console.error("Error fetching daily stats:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// 📈 Get statistics for the last 10 days
+export const getLast10DaysStats = async (req, res) => {
+  try {
+    const data = [];
+    const today = new Date();
+
+    for (let i = 9; i >= 0; i--) {
+      const day = new Date(today);
+      day.setDate(today.getDate() - i);
+      day.setHours(0, 0, 0, 0);
+
+      const nextDay = new Date(day);
+      nextDay.setDate(day.getDate() + 1);
+
+      const clicks = await Click.countDocuments({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const conversions = await Conversion.countDocuments({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const revenueDocs = await Conversion.find({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const revenue =
+        revenueDocs.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0) || 0;
+
+      data.push({
+        date: day.toLocaleDateString("en-GB"),
+        clicks,
+        conversions,
+        revenue,
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching last 10 days stats:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -7,7 +7,7 @@ import Compaign from "../models/compaignModel.js";
 import { v4 as uuidv4 } from 'uuid';
 
 export const trackClick = async (req, res) => {
-  let { campaign_id, pub_id,originalClick } = req.query;
+  let { campaign_id, pub_id,originalClick,sub1 } = req.query;
 
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   // const ip =req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
@@ -113,7 +113,8 @@ const compaign = await Compaign.findOne({ compId: campaign_id });
       referrer,
       isUnique,
       deviceId:deviceId,
-      originalClick:originalClick
+      originalClick:originalClick,
+      sub1:sub1
     });
 
     // Find campaign and increment click count
