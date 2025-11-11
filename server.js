@@ -44,7 +44,9 @@ const allowedOrigins = new Set([
   "https://www.top5shots.com/",
   "https://www.top5shots.com",
   "https://mvmtracking.com/",
-  "https://mvmtracking.com"
+  "https://mvmtracking.com",
+  "http://localhost:5174/",
+  "http://localhost:5174"
 ]);
 
 // CORS middleware setup

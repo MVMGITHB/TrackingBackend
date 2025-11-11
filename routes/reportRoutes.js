@@ -1,6 +1,7 @@
 import express from 'express';
 import { getCampaignReport ,getCampaignByPubIdReport, getAffiliateReportByDate,getCampaignBySubIdReport,getDailyStats,
-  getLast10DaysStats,} from '../controllers/campaignReportController.js';
+  getLast10DaysStats,getDailyStatspubId,
+  getLast10DaysStatspubId} from '../controllers/campaignReportController.js';
 
 
 const router = express.Router();
@@ -11,5 +12,7 @@ router.get('/publicerSubIdReport', getCampaignBySubIdReport);
 router.get("/affiliate", getAffiliateReportByDate);
 router.get("/daily", getDailyStats);
 router.get("/last10days", getLast10DaysStats);
+router.get("/dailypubId/:pubId", getDailyStatspubId);
+router.get("/last10dayspubId/:pubId", getLast10DaysStatspubId);
 
 export default router;
