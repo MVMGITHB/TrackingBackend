@@ -10,8 +10,9 @@ import xlsx from "xlsx";
 import fs from "fs";
 
 export const handlePostback = async (req, res) => {
-  let { click_id} = req.query;
+  let { click_id,sub1,sub2,sub3,sub4,sub5,sub6} = req.query;
 
+ 
 if (click_id) {
   // Remove curly braces and spaces
   click_id = click_id.replace(/[{}\s]/g, "");
@@ -48,6 +49,12 @@ if (click_id) {
       clickId: click_id,
       campaignId: click.campaignId,
       pubId: click.pubId,
+      sub1,
+      sub2,
+      sub3,
+      sub4,
+      sub5,
+      sub6,
       amount: amount || 0
     });
 

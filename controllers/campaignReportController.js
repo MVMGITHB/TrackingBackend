@@ -1317,3 +1317,78 @@ export const getLast10DaysStatspubId = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+export const getConversionReport = async (req, res) => {
+  try {
+    const { pubId, startDate, endDate } = req.query;
+
+    // Build query dynamically
+    const query = {};
+    if (pubId) query.pubId = pubId;
+    if (startDate && endDate) {
+      query.timestamp = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Aggregate Conversion data
+    const conversions = await Conversion.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "clicks", // collection name (lowercase plural)
+          localField: "clickId",
+          foreignField: "clickId",
+          as: "clickData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clickData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          campaignId: 1,
+          pubId: 1,
+          clickId: 1,
+          amount: 1,
+          sub1: 1,
+          sub2: 1,
+          sub3: 1,
+          sub4: 1,
+          sub5: 1,
+          sub6: 1,
+          timestamp: 1,
+          originalClick: "$clickData.originalClick", // include from Click model
+        },
+      },
+      { $sort: { timestamp: -1 } },
+    ]);
+
+    // Total revenue & count
+    const totalRevenue = conversions.reduce(
+      (sum, conv) => sum + (parseFloat(conv.amount) || 0),
+      0
+    );
+    const totalConversions = conversions.length;
+
+    res.status(200).json({
+      success: true,
+      message: pubId
+        ? `Conversion report for Affiliate pubId ${pubId}`
+        : "All Affiliates Conversion Report",
+      totalConversions,
+      totalRevenue,
+      data: conversions,
+    });
+  } catch (error) {
+    console.error("Error generating conversion report:", error);
+    res.status(500).json({ success: false, message: "Server Error", error });
+  }
+};
