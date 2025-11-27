@@ -207,3 +207,58 @@ res.redirect(finalUrl);
 };
 
 
+
+// GET all clicks
+export const getClicks = async (req, res) => {
+  try {
+    const clicks = await Click.find().sort({ timestamp: -1 }).limit(20); 
+    return res.status(200).json({ success: true, data: clicks });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// GET single click
+export const getClickById = async (req, res) => {
+  try {
+    const click = await Click.findById(req.params.id);
+    if (!click)
+      return res.status(404).json({ success: false, message: "Click not found" });
+
+    return res.status(200).json({ success: true, data: click });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// UPDATE click
+export const updateClick = async (req, res) => {
+  try {
+    const click = await Click.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!click)
+      return res.status(404).json({ success: false, message: "Click not found" });
+
+    return res.status(200).json({ success: true, data: click });
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// DELETE click
+export const deleteClick = async (req, res) => {
+  try {
+    const click = await Click.findByIdAndDelete(req.params.id);
+    if (!click)
+      return res.status(404).json({ success: false, message: "Click not found" });
+
+    return res.status(200).json({ success: true, message: "Click deleted" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
