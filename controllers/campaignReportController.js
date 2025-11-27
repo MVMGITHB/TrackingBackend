@@ -1376,6 +1376,8 @@ export const getConversionReport = async (req, res) => {
       (sum, conv) => sum + (parseFloat(conv.amount) || 0),
       0
     );
+
+    
     const totalConversions = conversions.length;
 
     res.status(200).json({

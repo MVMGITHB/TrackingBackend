@@ -7,7 +7,7 @@ import Compaign from "../models/compaignModel.js";
 import { v4 as uuidv4 } from 'uuid';
 
 export const trackClick = async (req, res) => {
-  let { campaign_id, pub_id,originalClick,sub1 } = req.query;
+  let { campaign_id, pub_id,originalClick,sub1,affiliate_id } = req.query;
 
   // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   // const ip =req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
@@ -113,7 +113,7 @@ const compaign = await Compaign.findOne({ compId: campaign_id });
       referrer,
       isUnique,
       deviceId:deviceId,
-      originalClick:originalClick,
+      originalClick:originalClick || affiliate_id,
       sub1:sub1
     });
 
