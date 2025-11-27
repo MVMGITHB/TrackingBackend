@@ -264,3 +264,41 @@ export const deleteClick = async (req, res) => {
   }
 };
 
+
+export const getCLickByPUbId = async (req, res) => {
+  try {
+    // 1. Find affiliate by Mongo ID
+    const affiliate = await Affiliate.findById(req.params.id);
+
+    if (!affiliate) {
+      return res.status(404).json({
+        success: false,
+        message: "Affiliate not found",
+      });
+    }
+
+    // 2. Extract pubId (Affiliate model uses Number, Click requires String)
+    const pubId = String(affiliate.pubId);
+
+    // 3. Find latest 20 clicks for this pubId
+    const clickData = await Click.find({ pubId })
+      .sort({ timestamp: -1 })
+      .limit(20);
+
+    return res.status(200).json({
+      success: true,
+      data: clickData,
+    });
+
+  } catch (error) {
+    console.error("Error fetching clicks by pubId:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+
+
+
