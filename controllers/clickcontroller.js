@@ -221,7 +221,9 @@ export const getClicks = async (req, res) => {
 // GET single click
 export const getClickById = async (req, res) => {
   try {
-    const click = await Click.findById(req.params.id);
+
+    
+    const click = await Click.findById({_id:req.params.id});
     if (!click)
       return res.status(404).json({ success: false, message: "Click not found" });
 
