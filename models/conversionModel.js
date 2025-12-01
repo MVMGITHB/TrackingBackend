@@ -11,6 +11,10 @@ const conversionSchema = new mongoose.Schema({
   sub4:String,
   sub5:String,
   sub6:String,
+  secondConversion: [{
+  amount: Number,
+  count: Number,
+}],
   timestamp: { type: Date, default: Date.now }
 });
 

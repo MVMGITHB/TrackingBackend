@@ -6,14 +6,19 @@
     "auditLog": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Tracking panel\\TrackingBackend\\logs\\.65d6a9dcda871111d25be02860fa7f1e4c9c6d81-audit.json",
     "files": [
         {
-            "date": 1763103125751,
-            "name": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Tracking panel\\TrackingBackend\\logs\\app-2025-11-14.log",
-            "hash": "17176e97e9cceca669192afdc66c718173ba1f43f5c1809f562df0869d553034"
-        },
-        {
             "date": 1764224989205,
             "name": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Tracking panel\\TrackingBackend\\logs\\app-2025-11-27.log",
             "hash": "998353126b24a4d28257ba0bbe4918e7caa657c1907685a64934b6216a9ea594"
+        },
+        {
+            "date": 1764322683159,
+            "name": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Tracking panel\\TrackingBackend\\logs\\app-2025-11-28.log",
+            "hash": "447667b4e6afc47659b413da6d7462f19b5d514216d1ea2204ccd8fa95589454"
+        },
+        {
+            "date": 1764574219519,
+            "name": "C:\\Users\\MVM BUSINESS SERVICE\\OneDrive\\Desktop\\Tracking panel\\TrackingBackend\\logs\\app-2025-12-01.log",
+            "hash": "ae8466bc10cd65fd36855ac6067f50bec34f6d1794d256848d496878330a2981"
         }
     ],
     "hashType": "sha256"

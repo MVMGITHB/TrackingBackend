@@ -37,12 +37,21 @@ if (click_id) {
       return res.status(404).json({ message: 'Click not found' });
     }
 
-    const presentClick = await Conversion.findOne({clickId:click_id});
+  const presentClick = await Conversion.findOne({ clickId: click_id });
 
-    if(presentClick){
-       logger.warn(`Conversion already exists | click_id: ${click_id}`);
-       return res.status(404).json({ message: 'Conversion already present' });
-    }
+if (presentClick) {
+    logger.warn(`Conversion already exists => Updating secondConversion | click_id: ${click_id}`);
+
+    presentClick.secondConversion.push({
+        amount: amount,
+        count: 1
+    });
+
+    await presentClick.save();
+
+    return res.json({ message: "Second conversion updated", data: presentClick });
+}
+
 
     // 2. Save conversion
     await Conversion.create({
