@@ -1142,7 +1142,44 @@ export const getCampaignBySubIdReport = async (req, res) => {
 };
 
 
-export const getDailyStats = async (req, res) => {
+// export const getDailyStats = async (req, res) => {
+//   try {
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+//     const tomorrow = new Date(today);
+//     tomorrow.setDate(tomorrow.getDate() + 1);
+
+//     const clicks = await Click.countDocuments({
+//       timestamp: { $gte: today, $lt: tomorrow },
+//     });
+
+//     const hosts = await Click.distinct("ip", {
+//       timestamp: { $gte: today, $lt: tomorrow },
+//     });
+
+//     const conversions = await Conversion.countDocuments({
+//       timestamp: { $gte: today, $lt: tomorrow },
+//     });
+
+//     console.log(clicks)
+
+//     res.json({
+//       clicks,
+//       hosts: hosts.length,
+//       conversions,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching daily stats:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
+
+
+
+
+// 📈 Get statistics for the last 10 days
+export const getDailyStats = async (req, res) => { 
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1161,12 +1198,34 @@ export const getDailyStats = async (req, res) => {
       timestamp: { $gte: today, $lt: tomorrow },
     });
 
-    console.log(clicks)
+    const revenueDocs = await Conversion.find({
+      timestamp: { $gte: today, $lt: tomorrow },
+    });
+
+    // MAIN revenue
+    const revenue =
+      revenueDocs.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0) || 0;
+
+    // NEW - secondConversion stats
+    let secondConversions = 0;
+    let secondRevenue = 0;
+
+    revenueDocs.forEach((doc) => {
+      if (Array.isArray(doc.secondConversion)) {
+        doc.secondConversion.forEach((s) => {
+          secondConversions += s.count || 0;
+          secondRevenue += s.amount || 0;
+        });
+      }
+    });
 
     res.json({
       clicks,
       hosts: hosts.length,
       conversions,
+      revenue,
+      secondConversions,  // NEW
+      secondRevenue,      // NEW
     });
   } catch (error) {
     console.error("Error fetching daily stats:", error);
@@ -1174,49 +1233,50 @@ export const getDailyStats = async (req, res) => {
   }
 };
 
-// 📈 Get statistics for the last 10 days
-export const getLast10DaysStats = async (req, res) => {
-  try {
-    const data = [];
-    const today = new Date();
 
-    for (let i = 9; i >= 0; i--) {
-      const day = new Date(today);
-      day.setDate(today.getDate() - i);
-      day.setHours(0, 0, 0, 0);
 
-      const nextDay = new Date(day);
-      nextDay.setDate(day.getDate() + 1);
+// export const getLast10DaysStats = async (req, res) => {
+//   try {
+//     const data = [];
+//     const today = new Date();
 
-      const clicks = await Click.countDocuments({
-        timestamp: { $gte: day, $lt: nextDay },
-      });
+//     for (let i = 9; i >= 0; i--) {
+//       const day = new Date(today);
+//       day.setDate(today.getDate() - i);
+//       day.setHours(0, 0, 0, 0);
 
-      const conversions = await Conversion.countDocuments({
-        timestamp: { $gte: day, $lt: nextDay },
-      });
+//       const nextDay = new Date(day);
+//       nextDay.setDate(day.getDate() + 1);
 
-      const revenueDocs = await Conversion.find({
-        timestamp: { $gte: day, $lt: nextDay },
-      });
+//       const clicks = await Click.countDocuments({
+//         timestamp: { $gte: day, $lt: nextDay },
+//       });
 
-      const revenue =
-        revenueDocs.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0) || 0;
+//       const conversions = await Conversion.countDocuments({
+//         timestamp: { $gte: day, $lt: nextDay },
+//       });
 
-      data.push({
-        date: day.toLocaleDateString("en-GB"),
-        clicks,
-        conversions,
-        revenue,
-      });
-    }
+//       const revenueDocs = await Conversion.find({
+//         timestamp: { $gte: day, $lt: nextDay },
+//       });
 
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching last 10 days stats:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+//       const revenue =
+//         revenueDocs.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0) || 0;
+
+//       data.push({
+//         date: day.toLocaleDateString("en-GB"),
+//         clicks,
+//         conversions,
+//         revenue,
+//       });
+//     }
+
+//     res.json(data);
+//   } catch (error) {
+//     console.error("Error fetching last 10 days stats:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 // this is previous code
 
@@ -1259,6 +1319,67 @@ export const getLast10DaysStats = async (req, res) => {
 //     res.status(500).json({ message: "Server error" });
 //   }
 // };
+
+// 📈 Get statistics for the last 10 days
+export const getLast10DaysStats = async (req, res) => {
+  try {
+    const data = [];
+    const today = new Date();
+
+    for (let i = 9; i >= 0; i--) {
+      const day = new Date(today);
+      day.setDate(today.getDate() - i);
+      day.setHours(0, 0, 0, 0);
+
+      const nextDay = new Date(day);
+      nextDay.setDate(day.getDate() + 1);
+
+      const clicks = await Click.countDocuments({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const conversions = await Conversion.countDocuments({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const revenueDocs = await Conversion.find({
+        timestamp: { $gte: day, $lt: nextDay },
+      });
+
+      const revenue =
+        revenueDocs.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0) || 0;
+
+      // NEW - secondConversion totals
+      let secondConversions = 0;
+      let secondRevenue = 0;
+
+      revenueDocs.forEach((doc) => {
+        if (Array.isArray(doc.secondConversion)) {
+          doc.secondConversion.forEach((s) => {
+            secondConversions += s.count || 0;
+            secondRevenue += s.amount || 0;
+          });
+        }
+      });
+
+      data.push({
+        date: day.toLocaleDateString("en-GB"),
+        clicks,
+        conversions,
+        revenue,
+        secondConversions, // NEW
+        secondRevenue,     // NEW
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching last 10 days stats:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 export const getDailyStatspubId = async (req, res) => {
   try {
